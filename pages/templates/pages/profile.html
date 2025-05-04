@@ -1,0 +1,70 @@
+{% extends "pages/base.html" %}
+
+{% block filter_navbar %}
+    {% include 'filter_navbar.html' %}
+{% endblock %}
+
+{% block javascript %}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        
+        <div class="col-md-3">
+            <!-- SIDEBAR -->
+            {% include 'sidebar.html' with active='profile'%}
+        </div>
+
+        <div class="col-md-9">
+            <div class="card from-left-animate">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h4>Profilom</h4>
+                            <hr>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <form>
+                                <div class="form-group row">
+                                    <label class="col-4 col-form-label">Felhasználónév</label>
+                                    <div class="col-8">
+                                        <input class="form-control" type="text" value="{{ user.username }}" readonly>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-4 col-form-label">Keresztnév</label>
+                                    <div class="col-8">
+                                        <input class="form-control" type="text" value="{{ user.first_name }}" readonly>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-4 col-form-label">Vezetéknév</label>
+                                    <div class="col-8">
+                                        <input class="form-control" type="text" value="{{ user.last_name }}" readonly>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-4 col-form-label">Email</label>
+                                    <div class="col-8">
+                                        <input class="form-control" type="email" value="{{ user.email }}" readonly>
+                                    </div>                     
+                                </form>   
+                                
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-12 mt-3">
+                                <a href="{% url 'reset_password' %}" class="btn btn-primary">Jelszó átállítás</a>
+                            </div>
+                        </div>
+                    </div>    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,101 @@
+{%load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet"> <!-- bootstrap-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="{%static "style.css" %}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> <!--https://www.w3schools.com/icons/tryit.asp?filename=tryicons_fa-sort -->
+    <!-- https://www.w3schools.com/icons/fontawesome_icons_webapp.asp -->
+    <title>{% block title %}Library-O{% endblock %}</title>
+    <link rel="icon" 
+    href= "https://w7.pngwing.com/pngs/541/36/png-transparent-literature-review-computer-icons-electronic-literature-prose-others-miscellaneous-angle-rectangle-thumbnail.png" 
+    type="image/png" /> <!-- a kép netről lett szedve. -->
+
+</head>
+<body>
+  
+
+  {%if messages%}
+    {%for message in messages%}
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+      {{message}}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    {%endfor%}
+  {%endif%}
+  
+  {% include 'navbar.html' %}
+
+  <!-- The content from specific pages will be inserted here -->
+  {%block filter_navbar%}
+  {%endblock%}
+
+  {%block javascript%}
+  {%endblock%}
+
+  {% block content %}
+  {% endblock %}
+  
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- jQuery segitsegevel harom masodperc utan eltunik a message pl. beleptetesnel -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script> <!--container indicators-->
+
+  <script>
+    $(document).ready(function(){
+      setTimeout(function(){
+        $(".alert").alert('close');
+      }, 4000);
+    });
+  </script>
+
+  <!-- ahol van masodik navbar, ott csuszik le ahogyan scrollol le a user. -->
+  <script>
+    // Select the two navbars
+    const firstNavbar = document.querySelector('.navbar-light');
+    const filterNavbar = document.querySelector('.filter-navbar-custom');
+  
+    // Function to manage navbar visibility on scroll
+    window.onscroll = function () {
+      if (window.scrollY > firstNavbar.offsetHeight) {
+        filterNavbar.classList.add('sticky');
+        firstNavbar.classList.add('first-navbar-hidden');
+      } else {
+        filterNavbar.classList.remove('sticky');
+        firstNavbar.classList.remove('first-navbar-hidden');
+      }
+    };
+  </script>
+
+<!--KONYVEK BEUGRANAK. IntersectionObserver segitsegevel-->  
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+          } else {
+            entry.target.classList.remove("visible");
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    const cards = document.querySelectorAll(".book-card");
+    cards.forEach(card => observer.observe(card));
+  });
+</script>
+
+  {%block extrascript%}
+  
+  {%endblock%}
+  
+</body>
+</html>

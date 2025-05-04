@@ -1,0 +1,116 @@
+{% extends "pages/base.html" %}
+
+{% load static %}
+
+{% block filter_navbar %}
+    {% include 'filter_navbar.html' %}
+{% endblock %}
+
+{% block javascript %}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        
+        <div class="col-md-3">
+            {% include 'sidebar.html' with active='view_wishlist'%}
+        </div>
+
+        <div class="col-md-9">
+            <div class="card from-left-animate">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h4>Kívánságlistám</h4>
+                            <hr>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            {% if not wishlist_items %}
+                            <div class="no-content-alert">
+                                <p>A kívánságlistád még üres...</p>
+                                <p>Kattints <a href="{% url 'home' %}">ide</a> és böngéssz a könyvek között!</p>
+                            </div>
+                            {% else %}
+                            <table class="table table-striped">     
+                                
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 15%; text-align: center;">Borító</th> 
+                                            <th style="width: 40%;">Könyv címe</th>
+                                            <th style="width: 35%;">Szerző</th>
+                                            <th style="width: 10%;"></th> 
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for item in page_obj %} 
+                                        <tr>
+                                            <td class="text-center borrow-book-link">
+                                                {% if item.book.cover_image %}
+                                                    <a href="{% url "book_detail" item.book.id %}">
+                                                        <img class="img-fluid" src="{{ item.book.cover_image.url }}" alt="{{ item.book.title }} borító" style="max-height: 100px; width: auto;">
+                                                    </a>
+                                                {% else %}
+                                                    <a href="{% url "book_detail" item.book.id %}">
+                                                        <img class="img-fluid" src="{% static 'site_images/unavailable_img.jpg' %}" alt="Nincs borító" style="max-height: 100px; width: auto;"> 
+                                                    </a>
+                                                {% endif %}
+                                            </td>
+                                            <td class="align-middle">
+                                                <h5>{{ item.book.title }}</h5>
+                                            </td>
+                                            <td class="align-middle">
+                                                <p>{{ item.book.author }}</p>
+                                            </td>
+                                            <td class="align-middle text-right"> 
+                                                <form action="{% url 'remove_from_wishlist' item.id %}" method="post" style="display: inline;">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-sm btn-danger borrow-delete-button">
+                                                        <img src="{% static 'site_images/trash.png' %}" width="20" height="20" alt="Eltávolítás" style="filter: brightness(0) invert(1);">
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                {% endif %}
+                            </table>
+                            </div>
+                    </div>      
+                </div>
+
+                <!--PAGINATION -->
+                <div class="pagination-container text-center">
+                    <span class="pagination-info">
+                        {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+                    </span>
+                    <div class="pagination-controls d-flex justify-content-between">
+                        
+                        <!-- Left Arrow Button-->
+                        <div class="left-arrow">
+                            {% if page_obj.has_previous %}
+                                <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-primary next-button">
+                                    <i class="bi bi-arrow-left"></i>
+                                </a>
+                            {% endif %}
+                        </div>
+                
+                        <!-- Right Arrow Button -->
+                        <div class="right-arrow">
+                            {% if page_obj.has_next %}
+                                <a href="?page={{ page_obj.next_page_number }}" class="btn btn-primary previous-button">
+                                    <i class="bi bi-arrow-right"></i>
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

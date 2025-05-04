@@ -1,0 +1,76 @@
+{% if page_obj.has_other_pages %}
+  <nav aria-label="Oldalak">
+    <ul class="pagination justify-content-center mt-4">
+      {% if page_obj.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if sorting_op %}&sort={{ sorting_op }}{% endif %}">
+            <i class="bi bi-arrow-left"></i>
+          </a>
+        </li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">
+          <i class="bi bi-arrow-left"></i>
+        </span></li>
+      {% endif %}
+      
+      <!-- pagination 1 ... last -->
+      {% with ''|center:page_obj.paginator.num_pages as range %}
+      {% for _ in range %}
+        {% with forloop.counter as i %}
+
+          {% if page_obj.paginator.num_pages > 3 %}
+
+            {% if i == page_obj.number or i == page_obj.number|add:"-1" or i == page_obj.number|add:"-2" or i == page_obj.number|add:"1" or i == page_obj.number|add:"2" %}
+              {% if i > 0 and i <= page_obj.paginator.num_pages %}
+                <li class="page-item {% if i == page_obj.number %}active{% endif %}">
+                  <a class="page-link" href="?page={{ i }}{% if sorting_op %}&sort={{ sorting_op }}{% endif %}">{{ i }}</a>
+                </li>
+              {% endif %}
+
+            {% elif i == 1 %}
+              <li class="page-item {% if i == page_obj.number %}active{% endif %}">
+                <a class="page-link" href="?page={{ i }}{% if sorting_op %}&sort={{ sorting_op }}{% endif %}">{{ i }}</a>
+              </li>
+
+              {% if page_obj.number > 3 %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ page_obj.number|add:"-3" }}{% if sorting_op %}&sort={{ sorting_op }}{% endif %}">...</a>
+                </li>
+              {% endif %}
+
+            {% elif i == page_obj.paginator.num_pages %}
+              {% if page_obj.number < page_obj.paginator.num_pages|add:"-2" %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ page_obj.number|add:"3" }}{% if sorting_op %}&sort={{ sorting_op }}{% endif %}">...</a>
+                </li>
+              {% endif %}
+
+              <li class="page-item {% if i == page_obj.number %}active{% endif %}">
+                <a class="page-link" href="?page={{ i }}{% if sorting_op %}&sort={{ sorting_op }}{% endif %}">{{ i }}</a>
+              </li>
+            {% endif %}
+
+          {% else %}
+            <li class="page-item {% if i == page_obj.number %}active{% endif %}">
+              <a class="page-link" href="?page={{ i }}{% if sorting_op %}&sort={{ sorting_op }}{% endif %}">{{ i }}</a>
+            </li>
+          {% endif %}
+
+        {% endwith %}
+      {% endfor %}
+      {% endwith %}
+      
+      {% if page_obj.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if sorting_op %}&sort={{ sorting_op }}{% endif %}">
+            <i class="bi bi-arrow-right"></i>
+          </a>
+        </li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">
+          <i class="bi bi-arrow-right"></i>
+        </span></li>
+      {% endif %}
+    </ul>
+  </nav>
+  {% endif %}

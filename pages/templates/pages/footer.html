@@ -1,0 +1,40 @@
+<footer class="footer"> 
+  <div class="container">
+      <div class="row">
+          <div class="col-md-3 footer-section">
+              <h5>Navigáció</h5>
+              <ul class="footer-links">
+                  <li><a href="{% url 'home' %}">Főoldal</a></li>
+                  <li><a href="{% url 'all_books_filter' %}">Összes könyv</a></li>
+                  {%if user.is_authenticated%}
+                  <li><a href="{% url 'for_you_filter' %}">Személyre szabott válogatás</a></li>
+                  <li><a href="{% url 'profile' %}">Profilom</a></li>
+                  {%else%}
+                  <li><a href="{% url 'login' %}">Bejelentkezés</a></li>
+                  <li><a href="{% url 'register' %}">Regisztráció</a></li>
+                  {%endif%}
+              </ul>
+          </div>
+      
+          
+          <div class="col-md-3 footer-section">
+              <h5>Kapcsolat</h5>
+              <div class="contact-info">
+                  <i class="fa fa-phone"></i>
+                  <span>+telefonszam</span>
+              </div>
+              <div class="contact-info">
+                  <i class="fa fa-envelope"></i>
+                  <span>e@mail.cim</span>
+              </div>
+          </div>
+                     
+      </div>
+      
+      <div class="footer-bottom">
+          <a href="{% url 'home' %}" class="footer-logo">LIBRARY-O</a>
+          <p class="footer-copyright">© 2025 Library-O. Minden jog fenntartva.</p>
+      </div>
+  </div>
+
+</footer>

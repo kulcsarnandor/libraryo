@@ -1,0 +1,27 @@
+{%load static%}
+<div class="list-group">
+  <a href="{% url 'profile' %}" class="list-group-item sidebar-item list-group-item-action {% if active == 'profile' %}sidebar-active{% endif %}">
+      Felhasználó info   <img src="{% static 'site_images/profile.png' %}" class="rounded-circle" width="30" height="30" alt="ProfilePic">
+  </a>
+  <a href="{% url 'current_borrowings'%}" class="list-group-item sidebar-item list-group-item-action {% if active == 'current_borrowings' %}sidebar-active{% endif %}">
+      Jelenlegi kölcsönzések <img src="{% static 'site_images/inprogress.png' %}" class="rounded-circle" width="30" height="30" alt="InprogressPic">
+  </a>
+  <a href="{% url 'history_borrowings'  %}" class="list-group-item sidebar-item list-group-item-action {% if active == 'history_borrowings' %}sidebar-active{% endif %}">
+    Kölcsönzési előzmények <img src="{% static 'site_images/history.png' %}" class="rounded-circle" width="30" height="30" alt="HistoryPic">
+</a>
+
+<a href="{%url 'reviews_profile'%}" class="list-group-item sidebar-item list-group-item-action {% if active == 'reviews_profile' %}sidebar-active{% endif %}">
+  Értékelések <img src="{% static 'site_images/review.png' %}" class="rounded-circle" width="30" height="30" alt="ReviewsPic">
+</a>
+
+<a href="{%url 'view_wishlist'%}" class="list-group-item sidebar-item list-group-item-action {% if active == 'view_wishlist' %}sidebar-active{% endif %}">
+  Kívánságlista   <img src="{% static 'site_images/wishlist.png' %}" class="rounded-circle" width="30" height="30" alt="WishlistPic">
+</a>
+
+  <a href="{% url 'view_borrowing_list'%}" class="list-group-item sidebar-item list-group-item-action {% if active == 'borrowing' %}sidebar-active{% endif %}">
+      Kölcsönzés igénylése   <img src="{% static 'site_images/borrowbookicon.png' %}" class="rounded-circle" width="30" height="30" alt="BorrowPic">
+  </a>
+
+
+  
+</div>

@@ -1,0 +1,29 @@
+
+<div class="sorting-navbar home-body">
+  <div class="container">
+    <div class="sorting-wrap">
+      <div class="sorting-title">
+        <i class="fa fa-filter"></i>
+        <span>Szűrő</span>
+      </div>
+        <div class="sorting-options">
+          <a href="?sort=title_asc" class="sorting-option {% if sorting_op == 'title_asc' %}active{% endif %}">
+            <i class="bi bi-sort-alpha-down"></i>
+            <span>A-Z</span>
+          </a>
+          <a href="?sort=title_desc" class="sorting-option {% if sorting_op == 'title_desc' %}active{% endif %}">
+            <i class="bi bi-sort-alpha-up"></i>
+            <span>Z-A</span>
+          </a>
+          <a href="?sort=availability" class="sorting-option {% if sorting_op == 'availability' %}active{% endif %}">
+            <i class="fa fa-check-square"></i>
+            <span>Elérhetőség</span>
+          </a>
+          <a href="?sort=fresh" class="sorting-option {% if sorting_op == 'fresh' %}active{% endif %}">
+            <i class="bi bi-plus-square"></i>
+            <span>Legutóbbiak</span>
+          </a>
+      </div>
+    </div>
+  </div>
+</div>

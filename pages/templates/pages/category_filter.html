@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block title %}{{category.category_name}} | {{page_obj.number}} | Library-O{% endblock %}
+
+{% block filter_navbar %}
+  {% include 'filter_navbar.html' %}
+{% endblock %}
+
+{%load static%}
+{%load cloudinary_optimize%}
+
+{% block javascript %}
+<script>
+    window.onload = function() {
+      document.querySelector('#filters-header-title').classList.add('header-title-animate');
+    };
+</script>
+{% endblock %}
+
+{% block content %}
+<header class = "filters-header">
+  <h1 id='filters-header-title'>
+    {{category.category_name}}
+  </h1>
+</header>
+
+{%include 'sort_navbar.html'%}
+
+<div class="container home-body">
+  <h2 class="filters-text-header">
+    {{category.category_name}} könyvek
+  </h2>
+  <div class="white-container">
+    <div class="row" >
+      {% for book in page_obj %}
+        <div class="col-md-3 col-sm-6 filter-pages-carousel-padding">
+          <a href="{% url 'book_detail' book.id %}" style="text-decoration: none; color: inherit;" class="card-link">
+            <div class="book-card">
+              {% if book.cover_image %}
+                <img src="{{ book.cover_image.url|cloudinary_minimize_image }}" class="card-img-top" alt="{{ book.title }}">
+              {% else %}
+                <img src="{% static 'site_images/unavailable_img.jpg' %}" class="card-img-top" alt="{{ book.title }}">
+              {% endif %}
+              <div class="card-body">
+                <h5 class="card-title"><strong>{{ book.title }}</strong></h5>
+                <p class="card-text">
+                  <strong>Szerző:</strong> {{ book.author.k_nev }} {{ book.author.v_nev }}
+                  <br>
+                  <strong>Műfaj:</strong>
+                  {% for category in book.category.all %}
+                    {{ category.category_name }}{% if not forloop.last %}, {% endif %}
+                  {% endfor %}
+                </p>
+                {% if book.is_available %}
+                  <p class="availability-status available">Elérhető: {{book.available_copies}} db</p>
+                {% else %}
+                  <p class="availability-status unavailable">Nem elérhető.</p>
+                {% endif %}
+              </div>
+            </div>
+          </a>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+    <!-- Pagination -->
+  {%include 'filter_pages.html'%}
+
+  {% include 'footer.html' %}
+
+{% endblock %}

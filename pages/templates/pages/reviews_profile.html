@@ -1,0 +1,98 @@
+{% extends "pages/base.html" %}
+
+{% load custom_filters %} <!-- repeat-hez-->
+
+{% block filter_navbar %}
+    {% include 'filter_navbar.html' %}
+{% endblock %}
+
+{% block javascript %}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        
+        <div class="col-md-3">
+            <!-- SIDEBAR -->
+            {% include 'sidebar.html' with active='reviews_profile'%}
+        </div>
+
+        <div class="col-md-9">
+            <div class="card from-left-animate">
+                <div class="card-body">
+                    <div class="col-md-12">
+                        <h4 class="text-center mb-0">Értékeléseim</h4>
+                        <hr>
+                        
+                        <!--PAGINATION -->
+                        <div class="pagination-container text-center mb-4">
+                          <span class="pagination-info">
+                              {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+                          </span>
+                          <div class="pagination-controls d-flex justify-content-between">
+                              <!-- Left Arrow Button -->
+                              <div class="left-arrow">
+                                  {% if page_obj.has_previous %}
+                                      <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-primary next-button">
+                                          <i class="bi bi-arrow-left"></i>
+                                      </a>
+                                  {% endif %}
+                              </div>
+                      
+                              <!-- Right Arrow Button -->
+                              <div class="right-arrow">
+                                  {% if page_obj.has_next %}
+                                      <a href="?page={{ page_obj.next_page_number }}" class="btn btn-primary previous-button">
+                                          <i class="bi bi-arrow-right"></i>
+                                      </a>
+                                  {% endif %}
+                              </div>
+                          </div>
+                        </div>
+
+                        {% if page_obj %}
+                          {% for review in page_obj %}
+                        
+                            <div class="card mb-3 review-card ">
+
+                        <a href="{% url 'book_detail' review.book.id %}" class="text-decoration-none text-dark">
+
+                              <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                  <div style="text-align: left">
+
+                                    <h5 class="review-book-title" >
+                                        {{ review.book.title }}
+                                      
+                                    </h5>
+                                    <small class="text-muted">{{ review.updated_at|date:"Y-m-d H:i" }}</small>
+                                  </div>
+                                  <div class="review-rating">
+                                    {{ review.rating }} {{ "⭐"|repeat:review.rating }}
+                                  </div>
+                                </div>
+                                <p class="mt-2 review-text">{{ review.comment }}</p>
+                              </div>
+                            </div>
+
+
+
+                        </a>
+
+                          {% endfor %}
+                          {%else%}
+                          <div class="no-content-alert">
+                              <p class="text-center mt-3">Még nem írtál véleményt...</p>
+                              <p>Kattints <a href="{% url 'home' %}">ide</a> és böngéssz a könyvek között!</p>
+                          </div>                    
+                        {% endif %}
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

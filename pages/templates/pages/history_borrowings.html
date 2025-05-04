@@ -1,0 +1,119 @@
+{% extends "pages/base.html" %}
+
+{% block filter_navbar %}
+    {% include 'filter_navbar.html' %}
+{% endblock %}
+
+{%load static%}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            <!--SIDEBAR -->
+            {% include 'sidebar.html' with active='history_borrowings' %}
+        </div>
+
+        <div class="col-md-9">
+            <div class="card from-left-animate">
+                <div class="card-body">
+                    <h4 class="text-center mb-0">Kölcsönzési előzményeim</h4>
+                    <hr>
+
+                    <!--PAGINATION -->
+                    <div class="pagination-container text-center">
+                        <span class="pagination-info">
+                            {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+                        </span>
+                        <div class="pagination-controls d-flex justify-content-between">
+                            
+                            <!-- Left Arrow Button-->
+                            <div class="left-arrow">
+                                {% if page_obj.has_previous %}
+                                    <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-primary next-button">
+                                        <i class="bi bi-arrow-left"></i>
+                                    </a>
+                                {% endif %}
+                            </div>
+                    
+                            <!-- Right Arrow Button -->
+                            <div class="right-arrow">
+                                {% if page_obj.has_next %}
+                                    <a href="?page={{ page_obj.next_page_number }}" class="btn btn-primary previous-button">
+                                        <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+
+                    {% if page_obj %}
+                        <div class="row">
+                            {% for history in page_obj %}
+                                <div class="col-md-6 mb-4">
+                                    <a href="{% url 'history_borrowings_detail' history.id %}" class="text-decoration-none">
+                                        <div class="history-card card h-100 shadow">
+                                            <div class="card-header history-card-header {% if history.is_late %}late-header{% else %}ontime-header{% endif %}">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <h5 class="card-title mb-0">
+                                                        <span class="history-number">#{{ forloop.counter0|add:page_obj.start_index }}</span>
+                                                    </h5>
+                                                    {% if history.is_late %}
+                                                        <span class="history-state">Késett</span>
+                                                    {% else %}
+                                                        <span class="history-state">Időben</span>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="book-count-info">
+                                                    <div class="book-count">
+                                                        <span>{{ history.book_count }}</span>
+                                                        <small>könyv</small>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="books-history-list">
+                                                    <ul class="book-history-titles">
+                                                        {% for book in history.books.all|slice:":2" %}
+                                                            <li>
+                                                                <div class="book-history-title-item">{{ book.title|truncatechars:50 }}</div>
+                                                            </li>
+                                                        {% endfor %}
+                                                        {% if history.books.all|length > 2 %}
+                                                            <p class="more-books">
+                                                                {{ history.books.all|length|add:"-2" }} további könyv...
+                                                            </p>
+                                                        {% endif %}
+                                                    </ul>
+                                                </div>
+                                                
+                                                <div class="return-date-info">
+                                                    <img src="{% static 'site_images/visszahozva.png' %}" width="30" height="30" alt="returnDate">
+                                                    <span style="margin-left: 2rem;">{{ history.return_date|date:"Y-m-d" }}</span>
+                                                </div>
+                                            </div>
+                                            <div class="card-footer history-card-footer">
+                                                <span>Részletek megtekintése</span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        
+                    {% else %}
+                        <div class="no-content-alert">
+                            <p>Nincsenek korábbi kölcsönzéseid...</p>
+                            <p>Kattints <a href="{% url 'home' %}">ide</a> és böngéssz a könyvek között!</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+{% endblock %}

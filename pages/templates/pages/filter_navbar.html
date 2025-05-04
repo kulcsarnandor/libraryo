@@ -1,0 +1,87 @@
+<nav class="navbar navbar-expand-lg filter-navbar-custom">
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mx-auto">
+
+      <!-- Mufajok dropdown -->
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle filter-dropdown" href="#" id="categoriesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Műfajok
+        </a>
+        <div class="dropdown-menu dropdown-menu-multi" aria-labelledby="categoriesDropdown">
+          {% with categories_count=categories|length %}
+            {% if categories_count > 10 %}
+              <div class="dropdown-multicol">
+                {% for category in categories %}
+                  {% if forloop.first or forloop.counter0|divisibleby:10 %}
+                    <div class="dropdown-col">
+                  {% endif %}
+                  
+                  <a class="dropdown-item" href="{%url 'category_filter' category.id%}">{{category.category_name}}</a>
+                  
+                  {% if forloop.counter|divisibleby:10 or forloop.last %}
+                    </div>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            {% else %}
+              {% for category in categories %}
+                <a class="dropdown-item" href="#">{{category.category_name}}</a>
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
+        </div>
+      </li>
+      
+      <!-- Szerzok dropdown -->
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle filter-dropdown" href="#" id="authorsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Szerzők
+        </a>
+        <div class="dropdown-menu dropdown-menu-multi" aria-labelledby="authorsDropdown">
+          {% with authors_count=authors_all|length %}
+            {% if authors_count > 10 %}
+              <div class="dropdown-multicol">
+                {% for author in authors_all %}
+                  {% if forloop.first or forloop.counter0|divisibleby:10 %}
+                    <div class="dropdown-col">
+                  {% endif %}
+                  
+                  <a class="dropdown-item" href="{%url 'author_filter' author.id%}">
+                    {{author.v_nev}} {{author.k_nev}}
+                  </a>
+                  
+                  {% if forloop.counter|divisibleby:10 or forloop.last %}
+                    </div>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            {% else %}
+              {% for author in authors_all %}
+              <a class="dropdown-item" href="{% url 'author_filter' author.id %}">
+                {{ author.v_nev }} {{ author.k_nev }}
+              </a>
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
+        </div>
+      </li>
+      
+      <!-- all books -->
+      <li class="nav-item">
+        <a class="nav-link filter-dropdown" href="{% url 'all_books_filter'%}" role="button">
+          Összes könyv
+        </a>
+      </li>
+
+      <!-- For You  -->
+      {%if user.is_authenticated%}
+      <li class="nav-item">
+        <a class="nav-link filter-dropdown" href="{% url 'for_you_filter' %}" role="button">
+          Személyre szabott
+        </a>
+      </li>
+      {%endif%}
+
+    </ul>
+  </div>
+</nav>

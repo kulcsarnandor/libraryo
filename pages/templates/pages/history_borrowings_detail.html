@@ -1,0 +1,97 @@
+{% extends "pages/base.html" %}
+
+{% block filter_navbar %}
+    {% include 'filter_navbar.html' %}
+{% endblock %}
+
+{%load static%}
+{%load cloudinary_optimize%}
+
+{% block javascript %}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            <!-- SIDEBAR -->
+            {% include 'sidebar.html' with active='history_borrowings' %}
+        </div>
+        <div class="col-md-9">
+            <div class="card topdown-animate">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h4>Kölcsönzési előzményeim</h4>
+                            <hr>
+
+                            <div class="pagination-container text-center">
+                              <div class="pagination-controls d-flex justify-content-between">
+                                  
+                                  <!-- Left Arrow Button -->
+                                  <div class="left-arrow">
+                                          <a href="{%url 'history_borrowings'%}" class="btn btn-primary next-button">
+                                              <i class="bi bi-arrow-left"></i>
+                                          </a>
+                                  </div>
+                        </div>
+                    </div>
+
+                    <div class="date-info-container">
+                      <div class="date-info-item">
+                          <div class="date-icon">
+                              <img src="{% static 'site_images/visszahozva.png' %}" width="30" height="30" alt="borrowDate">
+                          </div>
+                          <div class="date-details">
+                              <span class="date-label">Visszahozva:</span>
+                              <span class="date-value">{{ borrow_history.return_date|date:"Y-m-d" }}</span>
+                              
+                          </div>
+                      </div>              
+
+                  </div>
+                  <hr>
+                    <div class="row">
+                        {% for book in borrow_history.books.all %}
+                        <div class="col-md-4 mb-4">
+                          
+                          <a href="{% url 'book_detail' book.id %}" style="text-decoration: none; color: inherit;" class="card-link">
+                            <div class="book-card">
+                              {% if book.cover_image %}
+                                <img src="{{ book.cover_image.url|cloudinary_minimize_image }}" class="card-img-top" alt="{{ book.title }}">
+                              {% else %}
+                                <img src="{% static 'site_images/unavailable_img.jpg' %}" class="card-img-top" alt="{{ book.title }}">
+                              {% endif %}
+                                
+                              <div class="card-body">
+                                <h5 class="card-title"><strong>{{ book.title }}</strong></h5>
+                                <p class="card-text">
+                                  <strong>Szerző:</strong> {{ book.author.k_nev }} {{ book.author.v_nev }}
+                                  <br>
+                                  <strong>Műfaj:</strong>
+                                  {% for category in book.category.all %}
+                                    {{ category.category_name }}
+                                    {% if not forloop.last %}, {% endif %}
+                                  {% endfor %}
+                                </p>
+                          
+                                  {%if book.is_available%}
+                                    <p class="availability-status available">Elérhető: {{book.available_copies}} db</pi>
+                                  {%else%}
+                                    <p class="availability-status unavailable">Nem elérhető.</p>
+                                  {%endif%}
+      
+                                  </div>
+                                </div>
+                              </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

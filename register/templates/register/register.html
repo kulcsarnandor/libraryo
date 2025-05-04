@@ -1,0 +1,24 @@
+{% extends "pages/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %} Regisztráció | Library-O {% endblock %}
+
+{%block szuro_navbar%}
+{%endblock%}
+
+{% block content %}
+<div class="container mt-5 topdown-animate">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg p-4">
+                <h2 class="text-center mb-4"><b>Regisztráció</b></h2>
+                <form method="POST" class="form-group">
+                    {% csrf_token %}
+                    {{ register_form|crispy }}
+                    <button type="submit" class="btn btn-success btn-block">Regisztrálás</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

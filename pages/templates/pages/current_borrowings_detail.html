@@ -1,0 +1,166 @@
+{% extends "pages/base.html" %}
+
+{% block filter_navbar %}
+    {% include 'filter_navbar.html' %}
+{% endblock %}
+
+{% block javascript %}
+{% endblock %}
+
+{%load static%}
+{%load cloudinary_optimize%}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            <!-- SIDEBAR -->
+            {% include 'sidebar.html' with active='current_borrowings' %}
+        </div>
+        <div class="col-md-9">
+            <div class="card topdown-animate">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h4>Jelenlegi kölcsönzéseim</h4>
+                            <hr>
+                            <div class="d-flex justify-content-between">
+                                <div class="left-arrow">
+                                    <a href="{% url 'current_borrowings' %}" class="btn btn-primary previous-button">
+                                        <i class="bi bi-arrow-left"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {%if current_borrowings %}
+                    <div class="date-info-container">
+                        <div class="date-info-item">
+                            <div class="date-icon">
+                                <img src="{% static 'site_images/visszahozva.png' %}" width="30" height="30" alt="borrowDate">
+                            </div>
+                            <div class="date-details">
+                                <span class="date-label">Igényelve:</span>
+                                <span class="date-value">{{ current_borrowings.borrow_date|date:"Y-m-d" }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="date-info-item">
+                            <div class="date-icon">
+                                <img src="{% static 'site_images/expire.jpg' %}" width="30" height="30" alt="expireDate">
+                            </div>
+                            <div class="date-details">
+                                <span class="date-label">Határidő elvitelre:</span>
+                                <span class="date-value">{{ current_borrowings.expire_date|date:"Y-m-d" }} </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+                    
+                    <div class="row">
+                        {% for book_copy in current_borrowings.book_copies.all%}
+                        <div class="col-md-4 mb-4">
+                            <a href="{% url 'book_detail' book_copy.book.id %}" style="text-decoration: none; color: inherit;" class="card-link">
+                                <div class="book-card">
+                                    {% if book_copy.book.cover_image %}
+                                        <img src="{{ book_copy.book.cover_image.url|cloudinary_minimize_image }}" class="card-img-top" alt="{{ book_copy.book.title }}">
+                                    {% else %}
+                                        <img src="{% static 'site_images/unavailable_img.jpg' %}" class="card-img-top" alt="{{ book_copy.book.title }}">
+                                    {% endif %}
+                                    
+                                    <div class="card-body">
+                                        <h5 class="card-title"><strong>{{ book_copy.book.title }}</strong></h5>
+                                        <p class="card-text">
+                                            <strong>Szerző:</strong> {{ book_copy.book.author.k_nev }} {{ book_copy.book.author.v_nev }}
+                                            <br>
+                                            <strong>Műfaj:</strong>
+                                            {% for category in book_copy.book.category.all %}
+                                                {{ category.category_name }}
+                                                {% if not forloop.last %}, {% endif %}
+                                            {% endfor %}
+                                            <br>
+                                            <strong>Példány ID:</strong> {{ book_copy.id }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="delete-button card-footer">
+                        <form method="POST" action="{% url 'delete_current_borrowing' current_borrowings.id %}" onsubmit="return confirm('Biztosan szeretnéd törölni ezt az igénylést?');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger delete-button">
+                                <img src="{% static 'site_images/trash.png' %}" width="30" height="30" alt="DeleteIcon" style="filter: brightness(0) invert(1);">
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- VERIFIED -->
+                    {%elif verified_borrowings%}
+                    <div class="date-info-container">
+                        <div class="date-info-item">
+                            <div class="date-icon">
+                                <img src="{% static 'site_images/visszahozva.png' %}" width="30" height="30" alt="borrowDate">
+                            </div>
+                            <div class="date-details">
+                                <span class="date-label">Begyűjtve:</span>
+                                <span class="date-value">{{ verified_borrowings.borrow_date|date:"Y-m-d" }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="date-info-item">
+                            <div class="date-icon">
+                                <img src="{% static 'site_images/expire.jpg' %}" width="30" height="30" alt="expireDate">
+                            </div>
+                            <div class="date-details">
+                                <span class="date-label">Határidő leadásig:</span>
+                                <span class="date-value">{{ verified_borrowings.due_date|date:"Y-m-d" }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                        <div class="row">
+                            {% for book_copy in verified_borrowings.borrowing.book_copies.all %}
+                            <div class="col-md-4 mb-4">
+                                <a href="{% url 'book_detail' book_copy.book.id %}" style="text-decoration: none; color: inherit;" class="card-link">
+                                    <div class="book-card">
+                                        {% if book_copy.book.cover_image %}
+                                            <img src="{{ book_copy.book.cover_image.url|cloudinary_minimize_image }}" class="card-img-top" alt="{{ book_copy.book.title }}">
+                                        {% else %}
+                                            <img src="{% static 'site_images/unavailable_img.jpg' %}" class="card-img-top" alt="{{ book_copy.book.title }}">
+                                        {% endif %}
+                                        
+                                        <div class="card-body">
+                                            <h5 class="card-title"><strong>{{ book_copy.book.title }}</strong></h5>
+                                            <p class="card-text">
+                                                <strong>Szerző:</strong> {{ book_copy.book.author.k_nev }} {{ book_copy.book.author.v_nev }}
+                                                <br>
+                                                <strong>Műfaj:</strong>
+                                                {% for category in book_copy.book.category.all %}
+                                                    {{ category.category_name }}{% if not forloop.last %}, {% endif %}
+                                                {% endfor %}
+                                                <br>
+                                                <strong>Példány ID:</strong> {{ book_copy.id }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {%endif%}
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}
+

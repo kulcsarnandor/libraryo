@@ -1,0 +1,79 @@
+{% extends "pages/base.html" %}
+{% block filter_navbar %}
+    {% include 'filter_navbar.html' %}
+{% endblock %}
+
+{%load static%}
+
+{% block javascript %}
+{% endblock %}
+
+{% block content %}
+<div class="topdown-animate">
+    <div class="container">
+        <div class="card ">
+            <div class="card-header bg-dark text-light" style="padding: 2rem">
+                <h2><strong>Kölcsönzés igénylése</strong></h2>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    {%if not borrowing_list.list_item.all %}
+                        <h3>Nincsenek könyvek a listádban...</h3>
+                        <br><br>
+                        <p style="font-size: 18px">Kattints <a href="{%url "home" %}">ide</a> és böngéssz a könyvek között!</p>
+                    {%else%}
+                    <thead>
+                        <tr>
+                            <th>Borító</th>
+                            <th>Könyv címe</th>
+                            <th>Szerző</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in list_items %}
+                        <tr>
+                            <td class="text-center borrow-book-link">
+                                {% if item.book.cover_image %}
+                                    <a href = "{%url "book_detail" item.book.id%}"><img class="img-fluid" src="{{ item.book.cover_image.url }}"  alt="{{ item.book.title }} borító"  style="max-height: 150px; width: auto;">
+                                    </a>
+                                {% else %}
+                                <a href = "{%url "book_detail" item.book.id%}"><img class="img-fluid" src="{% static 'site_images/unavailable_img.jpg' %}" alt=" borító" style="max-height: 150px; width: auto;">
+                                </a>
+                                {% endif %}
+                            </td>
+                            <td class="text-left" style="padding-left:10rem">
+                                <h5>{{ item.book.title }}</h5>
+                            </td>
+                            <td class="text-left" style="padding-left:10rem">
+                                <p>{{ item.book.author }}</p>
+                            </td>
+                            <td>
+                                <span class="item-right">
+                                    <form action="{% url 'remove_from_borrowing_list' item.id %}" method="post">
+                                        {%csrf_token%}
+                                        <button type = "submit" class="btn btn-xs btn-danger pull-right borrow-delete-button">
+                                            <img src="{% static 'site_images/trash.png' %}" width="30" height="30" alt="DeleteIcon" style="filter: brightness(0) invert(1);">
+                                        </button>
+                                    </form>
+                                </span>
+                            </td>
+                        </tr>
+                        
+                        {% endfor %}
+                    </tbody>
+                    {%endif%}
+                </table>
+                
+            </div>
+            <div class="card-footer">
+                <form action="{% url 'process_borrowing_list' %}" method="post" onsubmit="return confirm('Igénylés megerősítése...');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary"><strong>Kölcsönzés!</strong></button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div> <!--ENDDIV ANIMATE-->
+
+{% endblock %}

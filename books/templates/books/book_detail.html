@@ -1,0 +1,402 @@
+{% extends "base.html" %}
+
+{%load static%}
+{% load custom_filters %} <!-- ertekeleshez, tobb csillag megjelenitesehez. templatetags folder-->
+
+{%block filter_navbar%}
+  {% include 'filter_navbar.html' %}
+{%endblock%}
+
+{% block title %}{{ book.title }} - Library-O{% endblock %}
+
+{%block javascript%}
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    let elements = document.querySelectorAll(".book-short-description");
+
+    elements.forEach(e => {
+      let Text = e.innerText;
+
+      if (Text.split(" ").length > 55) {
+        let shortDescriptionText = Text.split(" ").slice(0, 55).join(" ") + "... ";
+        let fullDescriptionLink = '<b><a href="#book-description" style="text-decoration: underline; color: inherit;">Teljes leírás...</a></b>';
+
+        e.innerHTML = shortDescriptionText + fullDescriptionLink;
+      }
+    });
+  });
+</script>
+
+{%endblock%}
+
+
+
+{% block content %}
+<div class="topdown-animate">
+  <div class="container mt-5">
+    <div class="row">
+      <!-- KEP A KONYVROL -->
+      <div class="col-md-4 col-sm-8">
+        <div class="book-cover-container">
+          {% if book.cover_image %}
+            <img src="{{ book.cover_image.url }}" class="img-thumbnail book-cover-details" alt="{{ book.title }}">
+          {% else %}
+            <img src="{% static 'site_images/unavailable_img.jpg' %}" class="img-fluid" alt="{{ book.title }}">
+          {% endif %}
+        </div> <!--END DIV book-cover-container -->
+      </div> <!--END DIV col-md-4 col-sm-8 -->
+
+      <!-- JOBB OLDALT LEIRASA A KONYVNEK -->
+      <div class="col-md-8 col-sm-12">
+        <div class="card" id="bookDetailsRightCard">
+          <div class="card-body">
+            <h2 class="book-title">{{ book.title }}</h2>
+            <hr>
+            <div class="book-details-right-body">
+              <p style="font-size:21px">Szerző: 
+                <a href="{%url 'author_filter' book.author.id%}" class="author-bubble">
+                  <strong>{{ book.author.v_nev }} {{ book.author.k_nev }}
+              </strong>
+              </a>
+              </p>
+
+              <p style="font-size:21px;">Műfaj: 
+                <strong>{% for category in book.category.all %}
+                  <a href="{%url 'category_filter' category.id%}" class="category-bubble">
+                    {{ category.category_name }}
+                  </a>
+                {% endfor %}
+              </strong>
+            </p>
+            </div> <!--END DIV  book-details-right-body-->
+            
+            <!-- WISHLIST -->
+            <div class="mt-3 wishlist-div">
+              {% if user.is_authenticated %}
+              <form action="{% url 'add_to_wishlist' %}" method="post">
+                  {% csrf_token %}
+                  <input type="hidden" name="book_id" value="{{ book.id }}">
+                  <button type="submit" class="btn btn-outline-primary wishlist-button" id="addToWishlist">
+                      <i class="fa fa-heart"></i> Kívánságlistára!
+                  </button>
+              </form>
+              {% else %}
+              <a href="{% url 'login' %}" class="btn btn-outline-primary wishlist-button" id="addToWishlist">
+                  <i class="fa fa-heart"></i> Kívánságlistára!
+              </a>
+              {% endif %}
+            </div> <!-- END DIV WISHLIST-->
+          </div> <!--END DIV  card-body-->
+          </div>  <!--END DIV  card-->
+
+          <!--Rovid leiras-->
+        <div class="card mt-2" id="bookDetailsRightCard">
+          <div class="card-body">
+            <h5 style="text-align:left; font-style: italic"><b>Rövid leírás</b></h5>
+            <div class="book-short-description">
+
+                {{book.description}}
+
+            </div>
+              
+          </div> <!--END DIV card body-->
+        </div> <!--END DIV card mt2 -->
+        
+        <!--AVAILABLE COPIES -->
+        <div class="available-copies {% if book.is_available %}bookdetails-available{% else %}bookdetails-unavailable{% endif %}">
+          <ul>
+            {% if book.is_available %}          
+              <li>Elérhető {{ book.available_copies }} példányban.</li>
+            {% else %}
+              <li>Nincs elérhető példány...</li>
+            {% endif %}
+          </ul>
+        </div>
+
+        <!-- KOLCSONZES GOMB -->
+        <div class="fade-in-bookdetail borrow-button">
+          {%if user.is_authenticated%}
+          <form action="{% url 'add_to_borrowing_list' book.id %}" method="post">
+            {% csrf_token %}
+            
+            <button type="submit" class="btn btn-outline-success" id="borrowButton">Igénylés</button>
+          </form>
+          {%else%}
+          <a href="{%url 'login' %}">
+            <button type="submit" class="btn btn-outline-success" id="borrowButton">Igénylés</button>
+          </a>
+          {%endif%}
+        </div>  <!--END DIV  borrow-button -->
+
+        
+
+
+      </div>  <!--END DIV  col-md-8 col-sm-12-->
+    </div>  <!--END DIV  row-->
+
+    <!--KONYV RESZLETEI LISTA-->
+    <div class="row fade-in-bookdetail"> 
+      <div class="col-md-4 col-sm-8">
+        <h3 style="text-align: left; margin-top: 25px"><strong>Könyv részletei</strong></h3>
+        <div class="card  mt-2 book-short-details" id="bookShortDetailsCard">
+          <table class="table">
+            <tbody>
+              <tr style="border-top: 4px solid #ddd">
+                <td >Szerző:</td>
+                <th >
+                    {{ book.author.v_nev }} {{ book.author.k_nev }}   
+                </th>
+              </tr>
+              <tr>
+                <td>Műfaj:</td>
+                <th>
+                  
+                  {% for category in book.category.all %}      
+                    {{ category.category_name }}{% if not forloop.last %}, {% endif %}
+                  {% endfor %}
+
+                </th>
+              </tr>
+              <tr>
+                <td>ISBN:</td>
+                <th>{{ book.isbn }}</th>
+              </tr>
+              <tr>
+                <td>Lapok száma:</td>
+                <th>{{ book.page_number }}</th>
+              </tr>
+            </tbody>
+          </table>
+        </div> <!-- END DIV card mt-2 book-short-details -->
+      </div> <!-- END col-md-4 col-sm-8 -->
+
+      <!--TELJES LEIRAS-->
+      <div class="col-md-8 col-sm-12">
+        <h3 style="text-align: left; margin-top: 25px"><strong>Leírás</strong></h3> 
+        <div class="card book-description" style="width: 250px;">
+            <div class="card-body" id="book-description">
+              <p>{{book.description}}</p>
+            </div>
+          </div>
+      </div>
+
+    </div> <!-- END row -->
+
+<!--SIMILAR CATEGORY CAROUSEL-->
+<div class="container mt-5 home-body fade-in-bookdetail">
+  {% if similar_books_group %}
+    <h2 class="carousel-h2 fade-in-bookdetails "><strong>Hasonló könyvek</strong></h3>
+    <div id="similarBooksCarousel" class="carousel slide carousel-books-list fade-in-bookdetail" data-ride="carousel" data-interval="false">
+      
+      <!-- DOT INDICATORS -->
+      <ol class="carousel-indicators">
+        {% for book_part in similar_books_group %}
+          <li data-target="#similarBooksCarousel" data-slide-to="{{ forloop.counter0 }}" class="{% if forloop.first %}active{% endif %}"></li>
+        {% endfor %}
+      </ol>
+
+      <div class="carousel-inner">
+        {% for book_part in similar_books_group %}
+          <div class="carousel-item {% if forloop.first %}active{% endif %}">
+            <div class="row justify-content-center">
+              {% for book in book_part %}
+                {% if book %}
+                <div class="col-md-3 col-sm-6">
+                  <a href="{% url 'book_detail' book.id %}" style="text-decoration: none; color: inherit;" class="card-link">
+                    <div class="book-card">
+                      {% if book.cover_image %}
+                        <img src="{{ book.cover_image.url }}" class="card-img-top" alt="{{ book.title }}">
+                      {% else %}
+                        <img src="{% static 'site_images/unavailable_img.jpg' %}" loading="lazy" class="card-img-top" alt="{{ book.title }}">
+                      {% endif %}
+                      <div class="card-body">
+                        <h5 class="card-title"><strong>{{ book.title }}</strong></h5>
+                        <p class="card-text">
+                          <strong>Szerző:</strong> {{ book.author.k_nev }} {{ book.author.v_nev }}<br>
+                          <strong>Műfaj:</strong>
+                          {% for category in book.category.all %}
+                            {{ category.category_name }}{% if not forloop.last %}, {% endif %}
+                          {% endfor %}
+                        </p>
+                        {% if book.is_available %}
+                          <p class="availability-status available">Elérhető: {{ book.available_copies }} db</p>
+                        {% else %}
+                          <p class="availability-status unavailable">Nem elérhető.</p>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </a>
+                </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <!-- CONTROLS -->
+      <a class="carousel-control-prev" href="#similarBooksCarousel" role="button" data-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="sr-only">Előző</span>
+      </a>
+      <a class="carousel-control-next" href="#similarBooksCarousel" role="button" data-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="sr-only">Következő</span>
+      </a>
+    </div>
+  {% endif %}
+</div>
+
+  <!--END CAROUSEL-->
+
+    
+  <!-- R E V I E W S -->
+<div class="reviews-section">
+  <h4 class="reviews-header">Értékelések <br> ({{ reviews.count }})</h4>
+
+
+  
+  <!-- avg rating -->
+<div class="fade-in-bookdetail">
+  {% if average_rating %}
+
+  <div class="average-rating">
+    <strong>Átlag értékelés:</strong>
+    <br>
+    {% for star in average_rating|star_icons %}
+      {% if star == "full" %}
+        <i class="fa fa-star" style="color: gold;"></i>
+      {% elif star == "half" %}
+        <i class="fa fa-star-half" style="color: gold;"></i>
+      {% else %}
+        <i class="fa fa-star-empty"></i>
+      {% endif %}
+    {% endfor %}
+    <br>
+    {{ average_rating|floatformat:1 }}
+  </div>
+{% endif %}
+</div>
+  <!-- END avg rating -->
+   
+  
+  {% if user.is_authenticated %}
+
+  <div class="card fade-in-bookdetail review-form-card">
+    <div class="card-body">
+      <h5 class="review-form-title">Vélemény írása</h5>
+      <form method="post" action="{% url 'submit_review' book.id %}" class="review-form">
+        {% csrf_token %}
+        <div class="form-group mb-3" style="text-align: left">
+          <label for="rating"><strong>Értékelés:</strong></label>
+          <select name="rating" id="rating" class="form-control" required>
+            <option value="">Válassz értékelést!</option>
+            {% for i in "12345" %}
+            <option value="{{ i }}"> {{ i }} {{ "⭐"|repeat:i }} </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group mb-4" style="text-align: left">
+          <label for="comment"><strong>Megjegyzés:</strong></label>
+          <textarea required name="comment" id="comment" class="form-control" maxlength="500" placeholder="Írd le a véleményed..." style="resize: none; height: 120px;"></textarea>
+          <small id="charactersPressed" class="text-muted">0/500 karakter</small>
+        </div>
+
+        {%if user_review_submitted %}
+          <button type="submit" class="btn btn-success review-submit-btn">Frissítés</button>
+        {%else%}
+          <button type="submit" class="btn btn-success review-submit-btn">Megjegyzés</button>
+        {%endif%}
+      </form>
+
+    </div>
+  </div>
+
+  {% else %}
+  <div class="text-center mb-4  fade-in-bookdetail">
+    <p><a href="{% url 'login' %}" class="review-login-link">Jelentkezz be a hozzászóláshoz.</a></p>
+  </div>
+  {% endif %}
+  
+  {% if reviews %}
+    {% for review in reviews %}
+    <div class="fade-in-bookdetail">
+      <div class="card review-card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h5 class="review-username">{{ review.user.username }}</h5>
+              <h6 class="review-date">{{ review.updated_at|date:"Y-m-d H:i" }}</h6>
+            </div>
+            <div class="review-rating">{{ review.rating }} {{ "⭐"|repeat:review.rating }}</div>
+          </div>
+          <p class="review-text">{{ review.comment }}</p>
+
+          {% if user == review.user %}
+          <form method="post" action="{% url 'delete_review' review.id %}" style="text-align: right;">
+            {% csrf_token %}
+            <button class="btn btn-sm btn-danger mt-2 delete-review-button"  onclick="return confirm('Biztosan törölni szeretnéd az értékelést?')">
+              Törlés
+              <img src="{% static 'site_images/trash.png' %}" width="30" height="30" alt="DeleteIcon" style="filter: brightness(0) invert(1);">
+            </button>
+          </form>
+          {% endif %}
+
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <div class="fade-in-bookdetail no-reviews-message">
+      <p>Még nincsenek vélemények ehhez a könyvhöz.</p>
+    </div>
+  {% endif %}
+</div>
+
+  </div>  <!--END DIV  container mt-5-->
+</div> <!-- END DIV ANIMACIO -->
+
+{%block extrascript%}
+<!--komment hossz szamolo -->
+<script>
+  document.getElementById('comment').addEventListener('input', function() {
+    const maxLen = 500;
+    const currentLen = this.value.length;
+    document.getElementById('charactersPressed').textContent = 
+      `${currentLen}/${maxLen} karakter`;
+  }
+);
+</script>
+
+
+<!-- Fade-ek scriptje. CSS: fade-in-bookdetail-->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const faders = document.querySelectorAll('.fade-in-bookdetail');
+  
+    const appearOptions = {
+      threshold: 0.15,
+      rootMargin: "0px 0px -50px 0px"
+    };
+  
+    const appearOnScroll = new IntersectionObserver(function (entries, observer) {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+  
+        entry.target.classList.add("visible");
+        observer.unobserve(entry.target);
+      });
+    }, appearOptions);
+  
+    faders.forEach(fader => {
+      appearOnScroll.observe(fader);
+    });
+  });
+  </script>
+{%endblock%}
+
+{%include 'footer.html'%}
+
+{% endblock %}
+
+

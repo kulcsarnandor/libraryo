@@ -1,0 +1,149 @@
+{% extends "pages/base.html" %}
+
+{% block filter_navbar %}
+    {% include 'filter_navbar.html' %}
+{% endblock %}
+
+{%load static%}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            <!--SIDEBAR -->
+            {% include 'sidebar.html' with active='current_borrowings' %}
+        </div>
+
+        <div class="col-md-9">
+            <div class="card from-left-animate">
+                <div class="card-body">
+                    <h4 class="text-center mb-0">Jelenlegi kölcsönzéseim</h4>
+                    <hr>
+                    <div class="row">
+                    {% if current_borrowings %}
+                        
+                            {% for borrowing in current_borrowings %}
+                                <div class="col-md-6 mb-4">
+                                    <a href="{%url 'current_borrowings_detail' borrowing.id %}" class="text-decoration-none">
+                                    <div class="current-card card h-100 shadow">
+                                        <div class="card-header current-card-header foglalva-header">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <h5 class="card-title mb-0">
+                                                    <span class="history-number">#{{ forloop.counter }}</span>
+                                                </h5>
+                                                    <span class="span-foglalva">Foglalva...</span>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="book-count-info">
+                                                <div class="book-count">
+                                                    <span>{{ borrowing.book_copies.count }}</span>
+                                                    <small>könyv</small>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="books-history-list">
+                                                <ul class="book-history-titles">
+                                                    {% for book_copy in borrowing.book_copies.all|slice:":2" %}
+                                                        <li>
+                                                            <div class="book-history-title-item">{{ book_copy.book.title|truncatechars:50 }}</div>
+                                                        </li>
+                                                    {% endfor %}
+                                                    {% if borrowing.book_copies.count > 2 %}
+                                                        <p class="more-books">
+                                                            {{ borrowing.book_copies.count|add:"-2" }} további könyv...
+                                                        </p>
+                                                    {% endif %}
+                                                </ul>
+                                            </div>
+                                            
+                                            <div class="return-date-info">
+                                                <img src="{% static 'site_images/visszahozva.png' %}" width="30" height="30" alt="returnDate">
+                                                <span style="margin-left: 2rem;">{{ borrowing.expire_date|date:"Y-m-d" }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="card-footer history-card-footer">
+                                            <span>Részletek megtekintése</span>
+                                        </div>
+                                    </div>
+                                </a>
+                                </div>
+                            {% endfor %}
+                        
+                        
+                    {%endif%}
+
+                    <!--VERIFIED -->
+                    {% if verified_borrowings %}
+
+                        {% for verif_borrowing in verified_borrowings %}
+                        <div class="col-md-6 mb-4">
+                            <a href="{% url 'verified_borrowings_detail' verif_borrowing.id %}" class="text-decoration-none">
+                            <div class="current-card card h-100 shadow">
+                                
+                                <div class="card-header 
+                                 {%if verif_borrowing.is_late%}history-card-header late-header{%else%} verified-card-header verified-header{% endif %}">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0">
+                                    <span class="history-number">#{{ forloop.counter }}</span>
+                                    </h5>
+                                    {%if verif_borrowing.is_late%}
+                                    <span class="span-verified">VISSZAHOZNI!</span>
+                                    {%else%}
+                                    <span class="span-verified">Kikölcsönözve</span>
+                                    {%endif%}
+                                </div>
+                                </div>
+                                <div class="card-body">
+                                <div class="book-count-info">
+                                    <div class="book-count">
+                                    <span>{{ verif_borrowing.borrowing.book_copies.count }}</span>
+                                    <small>könyv</small>
+                                    </div>
+                                </div>
+
+                                <div class="books-history-list">
+                                    <ul class="book-history-titles">
+                                    {% for book_copy in verif_borrowing.borrowing.book_copies.all|slice:":2" %}
+                                        <li>
+                                        <div class="book-history-title-item">{{ book_copy.book.title|truncatechars:50 }}</div>
+                                        </li>
+                                    {% endfor %}
+                                    {% if verif_borrowing.borrowing.book_copies.count > 2 %}
+                                        <p class="more-books">
+                                        {{ verif_borrowing.borrowing.book_copies.count|add:"-2" }} további könyv...
+                                        </p>
+                                    {% endif %}
+                                    </ul>
+                                </div>
+
+                                <div class="return-date-info">
+                                    <img src="{% static 'site_images/visszahozva.png' %}" width="30" height="30" alt="returnDate">
+                                    <span style="margin-left: 2rem;">{{ verif_borrowing.due_date|date:"Y-m-d" }}</span>
+                                </div>
+                                </div>
+                                <div class="card-footer history-card-footer">
+                                <span>Részletek megtekintése</span>
+                                </div>
+                            </div>
+                            </a>
+                        </div>
+                        {% endfor %}
+                    {%endif %}
+                    {% if not current_borrowings and not verified_borrowings %}
+                    <div class="no-content-alert">
+                        <p>Nincsenek jelenleg kölcsönzéseid...</p>
+                        <p>Kattints <a href="{% url 'home' %}">ide</a> és böngéssz a könyvek között!</p>
+                    </div>
+                {% endif %}
+                </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}

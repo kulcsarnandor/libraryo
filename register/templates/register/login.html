@@ -1,0 +1,28 @@
+{% extends "pages/base.html" %}
+{% load crispy_forms_tags %} 
+<!-- BOOTSTRAP: https://getbootstrap.com/docs/5.3/forms/overview/ -->
+
+{% block title %} Bejelentkezés | Library-O {% endblock %}
+
+{%block szuro_navbar%}
+{%endblock%}
+
+{% block content %}
+<div class="container mt-5 topdown-animate">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg p-4">
+                <h2 class="text-center mb-4"><b>Bejelentkezés</b></h2>
+                <form method="POST" action="{% url 'login' %}">
+                    {% csrf_token %}
+                    {{ login_form|crispy }}  <!-- bootstrap styling, szebb form. -->
+                    <button type="submit" class="btn btn-success btn-block">Belépés</button>
+                </form>
+                <p class="text-center mt-3">Elfelejtetted a jelszavad? <a href="{%url 'reset_password' %}">Állítsd vissza itt.</a></p>
+                <br><hr><br>
+                <p class="text-center mt-3">Nincs még fiókod? <a href="{% url 'register' %}">Regisztrálj itt.</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}{{searches}} | Library-O{% endblock %}
+
+{% block filter_navbar %}
+  {% include 'filter_navbar.html' %}
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5">
+  <div class="white-container topdown-animate">
+    <div class="row">
+      <div class="col-md-12">
+        
+        <h2 class="carousel-h2 mb-4">Keresési eredmények: "<span style="color: rgb(46, 139, 87);">{{searches}}</span>"</h2>
+        <hr>
+        
+        {% if books or authors %}
+          <div class="search-results-container">
+            {% if books %}
+              <div class="search-section">
+                <h4 class="search-category-title"><i class="fa fa-book mr-2"></i> Könyvek</h4>
+                <div class="row">
+                  {% for book in books %}
+                    <div class="col-md-6 mb-3">
+                      <div class="search-result-item">
+                        <div class="search-result-content">
+                          <a href="{% url 'book_detail' book.id %}" class="search-result-title">{{ book.title }}</a>
+                          <p class="search-result-author">{{ book.author.v_nev }} {{book.author.k_nev}}</p>
+                        </div>
+                        <div class="search-result-arrow">
+                          <i class="bi bi-arrow-right"></i>
+                        </div>
+                      </div>
+                    </div>
+
+                  {% endfor %}
+
+                </div>
+              </div>
+
+            {% endif %}
+            
+            {% if authors %}
+              <div class="search-section">
+                <h4 class="search-category-title"><i class="fa fa-pencil mr-2"></i> Szerzők</h4>
+                <div class="row">
+                  {% for author in authors %}
+                    <div class="col-md-6 mb-3">
+                      <div class="search-result-item">
+                        <div class="search-result-content">
+                          <a href="{% url 'author_filter' author.id %}" class="search-result-title">
+                            {{ author.v_nev }} {{ author.k_nev }}
+
+                          </a>
+                          <p class="search-result-meta">Szerző</p>
+                        </div>
+
+                        <div class="search-result-arrow">
+                          <i class="bi bi-arrow-right"></i>
+                        </div>
+
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+            {% endif %}
+          </div>
+        {% else %}
+
+          <div class="no-content-alert">
+            <i class="fas fa-search"></i>
+            <p>Nincs találat a(z) '<span style="font-weight: bold;">{{ searches }}</span>' keresésre.</p>
+            <p>Próbálj meg másik kulcsszóval keresni!</p>
+            <p><a href="{% url 'home' %}">Vissza a főoldalra...</a> </p>
+          </div>
+
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{%include 'footer.html'%}
+
+{% endblock %}

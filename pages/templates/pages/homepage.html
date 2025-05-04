@@ -1,0 +1,457 @@
+{% extends 'base.html' %}
+{% block title %}Library-O{% endblock %}
+
+{% block filter_navbar %}
+  {% include 'filter_navbar.html' %}
+{% endblock %}
+
+{%load static%}
+{% load cache %}
+{%load cloudinary_optimize %}
+
+{% block javascript %}
+
+<script>
+  window.onload = function() {
+    document.querySelector('#homepage-header-title').classList.add('header-title-animate');
+  };
+</script>
+
+{% endblock %}
+
+{% block content %}
+  <header class="homepage-header">
+    <h1 id="homepage-header-title">
+      LIBRARY-O
+    </h1>
+  </header>
+ 
+  
+  <div class="container home-body">
+
+    <!-- OSSZES KONYV CAROUSEL, HA NINCS BEJELENTKEZVE .-->
+    {%if not user.is_authenticated%}
+    {% cache 900 all_books_carousel %}
+    <h2 class="carousel-h2">Böngéssz a választékunkból!</h2>
+    <div id="allBooksCarousel" class="carousel slide carousel-books-list" data-ride="carousel" data-interval="false">
+
+      <!-- carousel pottyok -->
+      <ol class="carousel-indicators">
+        {% for book_part in all_books_group %}
+          <li data-target="#allBooksCarousel" 
+          data-slide-to="{{ forloop.counter0 }}" 
+          class="{% if forloop.first %}active{% endif %}">
+          </li>
+        {% endfor %}
+      </ol>
+
+      <!--tovabbi konyvek gomb-->
+      <div class="tovabbi-konyvek d-flex justify-content-end align-items-center mb-3">
+        <a href="{% url 'all_books_filter' %}" class="btn search-button">
+            További könyvek <i class="fa fa-arrow-right"></i>
+          
+        </a>
+      </div>
+
+
+      <div class="carousel-inner"> 
+        {% for book_part in all_books_group %}
+      <div class="carousel-item {% if forloop.first %}active{% endif %}">
+        <div class="row justify-content-center">
+              {% for book in book_part %}
+                {% if book %}  
+                  <div class="col-md-3 col-sm-6">
+                    <a href="{% url 'book_detail' book.id %}" style="text-decoration: none; color: inherit;" class="card-link">
+                      <div class="book-card">
+                        {% if book.cover_image %}
+                          <img src="{{ book.cover_image.url|cloudinary_minimize_image }}" loading="lazy" class="card-img-top" alt="{{ book.title }}">
+                        {% else %}
+                          <img src="{% static 'site_images/unavailable_img.jpg' %}" loading="lazy" class="card-img-top" alt="{{ book.title }}">
+                        {% endif %}
+                          
+                        <div class="card-body">
+                          <h5 class="card-title"><strong>{{ book.title }}</strong></h5>
+                          <p class="card-text">
+                            <strong>Szerző:</strong> {{ book.author.k_nev }} {{ book.author.v_nev }}
+                            <br>
+                            <strong>Műfaj:</strong>
+                            {% for category in book.category.all %}
+                              {{ category.category_name }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                          </p>
+                    
+                            {%if book.is_available%}
+                              <p class="availability-status available">Elérhető: {{book.available_copies}} db</pi>
+                            {%else%}
+                              <p class="availability-status unavailable">Nem elérhető.</p>
+                            {%endif%}
+
+                            </div>
+                          </div>
+                        </a>
+                      </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+  
+     
+      <a class="carousel-control-prev" href="#allBooksCarousel" role="button" data-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="sr-only">Previous</span>
+      </a>
+      <a class="carousel-control-next" href="#allBooksCarousel" role="button" data-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="sr-only">Next</span>
+      </a>
+    </div>  
+  </div>
+    
+    {% endcache %}
+    <!-- AJANLOTT KONYVEK CAROUSEL-->
+    {%else%}
+    
+    <h2 class="carousel-h2">Válogatásunk számodra</h2>
+    <div id="recommendedBookCarousel" class="carousel slide carousel-books-list" data-ride="carousel" data-interval="false">
+
+      <!-- POTTYOK CARUSEL ALATT.-->
+      <ol class="carousel-indicators">
+        {% for book_part in recommended_book_group %}
+          <li data-target="#recommendedBookCarousel" 
+          data-slide-to="{{ forloop.counter0 }}" 
+          class="{% if forloop.first %}active{% endif %}">
+          </li>
+        {% endfor %}
+      </ol>
+
+
+      <!-- tovabbi konyvek gomb.-->
+        <div class="tovabbi-konyvek d-flex justify-content-end align-items-center mb-3">
+          <a href="{% url 'for_you_filter' %}" class="btn search-button">
+            További könyvek <i class="fa fa-arrow-right"></i>
+          </a>
+        </div>
+
+      <div class="carousel-inner"> 
+        {% for book_part in recommended_book_group %}
+      <div class="carousel-item {% if forloop.first %}active{% endif %}">
+        <div class="row justify-content-center">
+              {% for book in book_part %}
+                {% if book %}  {# Avoid empty slots #}
+                  <div class="col-md-3 col-sm-6">
+                    <a href="{% url 'book_detail' book.id %}" style="text-decoration: none; color: inherit;" class="card-link">
+                      <div class="book-card">
+                        {% if book.cover_image %}
+                          <img src="{{ book.cover_image.url|cloudinary_minimize_image }}" loading="lazy" class="card-img-top" alt="{{ book.title }}">
+                        {% else %}
+                          <img src="{% static 'site_images/unavailable_img.jpg' %}" loading="lazy" class="card-img-top" alt="{{ book.title }}">
+                        {% endif %}
+                          
+                        <div class="card-body">
+                          <h5 class="card-title"><strong>{{ book.title }}</strong></h5>
+                          <p class="card-text">
+                            <strong>Szerző:</strong> {{ book.author.k_nev }} {{ book.author.v_nev }}
+                            <br>
+                            <strong>Műfaj:</strong>
+                            {% for category in book.category.all %}
+                              {{ category.category_name }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                          </p>
+                    
+                            {%if book.is_available%}
+                              <p class="availability-status available">Elérhető: {{book.available_copies}} db</pi>
+                            {%else%}
+                              <p class="availability-status unavailable">Nem elérhető.</p>
+                            {%endif%}
+
+                            </div>
+                          </div>
+                        </a>
+                      </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+  
+     
+      <a class="carousel-control-prev" href="#recommendedBookCarousel" role="button" data-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="sr-only">Previous</span>
+      </a>
+      <a class="carousel-control-next" href="#recommendedBookCarousel" role="button" data-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="sr-only">Next</span>
+      </a>
+    </div>  
+  {%endif%}
+  </div>
+  <!-- END AJANLOTT CAROUSEL/LISTA-->
+
+  <!-- RECENT BOOKS -->
+  <div class="container home-body">
+
+    <h2 class="carousel-h2 fade-in-effect-general">Újdonságok</h2>
+    <div id="recentBooksCarousel" class="carousel slide carousel-books-list fade-in-effect-general" data-ride="carousel" data-interval="false">
+  
+      <!-- Dots -->
+      <ol class="carousel-indicators">
+        {% for book_part in recent_books_group %}
+          <li data-target="#recentBooksCarousel"
+              data-slide-to="{{ forloop.counter0 }}"
+              class="{% if forloop.first %}active{% endif %}">
+          </li>
+        {% endfor %}
+      </ol>
+  
+      <!-- További könyvek -->
+      <div class="tovabbi-konyvek d-flex justify-content-end align-items-center mb-3">
+        <a href="{% url 'all_books_filter'  %}?sort=fresh" class="btn search-button">
+          További könyvek <i class="fa fa-arrow-right"></i>
+        </a>
+      </div>
+  
+      <!-- Carousel inner -->
+      <div class="carousel-inner">
+        {% for book_part in recent_books_group %}
+          <div class="carousel-item {% if forloop.first %}active{% endif %}">
+            <div class="row justify-content-center">
+              {% for book in book_part %}
+                {% if book %}
+                <div class="col-md-3 col-sm-6">
+                  <a href="{% url 'book_detail' book.id %}" style="text-decoration: none; color: inherit;" class="card-link">
+                    <div class="book-card">
+                      {% if book.cover_image %}
+                        <img src="{{ book.cover_image.url|cloudinary_minimize_image }}" loading="lazy" class="card-img-top" alt="{{ book.title }}">
+                      {% else %}
+                        <img src="{% static 'site_images/unavailable_img.jpg' %}" loading="lazy" class="card-img-top" alt="{{ book.title }}">
+                      {% endif %}
+                      <div class="card-body">
+                        <h5 class="card-title"><strong>{{ book.title }}</strong></h5>
+                        <p class="card-text">
+                          <strong>Szerző:</strong> {{ book.author.k_nev }} {{ book.author.v_nev }}<br>
+                          <strong>Műfaj:</strong>
+                          {% for category in book.category.all %}
+                            {{ category.category_name }}{% if not forloop.last %}, {% endif %}
+                          {% endfor %}
+                        </p>
+                        {% if book.is_available %}
+                          <p class="availability-status available">Elérhető: {{ book.available_copies }} db</p>
+                        {% else %}
+                          <p class="availability-status unavailable">Nem elérhető.</p>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </a>
+                </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+  
+      <!-- Controls -->
+      <a class="carousel-control-prev" href="#recentBooksCarousel" role="button" data-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="sr-only">Previous</span>
+      </a>
+      <a class="carousel-control-next" href="#recentBooksCarousel" role="button" data-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="sr-only">Next</span>
+      </a>
+  
+    </div>
+
+  </div>
+  <!-- END RECENT BOOKS -->
+
+<!-- random ajanlott category lista-->
+  {% for carousel in recommended_category_carousels %}
+  <div class="container home-body">
+    <h2 class="carousel-h2 fade-in-effect-general">Neked ajánljuk: {{ carousel.category.category_name }}</h2>
+    <div id="recommendedCategoryCarousel{{ forloop.counter }}" class="carousel slide carousel-books-list fade-in-effect-general" data-ride="carousel" data-interval="false">
+
+      <!-- POTTYOK -->
+      <ol class="carousel-indicators">
+        {% for book_part in carousel.book_group %}
+          <li data-target="#recommendedCategoryCarousel{{ forloop.parentloop.counter }}" 
+              data-slide-to="{{ forloop.counter0 }}" 
+              class="{% if forloop.first %}active{% endif %}"></li>
+        {% endfor %}
+      </ol>
+
+      <!-- tovabbi konyvek -->
+      <div class="tovabbi-konyvek d-flex justify-content-end align-items-center mb-3">
+        <a href="{% url 'category_filter' carousel.category.id %}" class="btn search-button">
+          További könyvek <i class="fa fa-arrow-right"></i>
+        </a>
+      </div>
+
+      <div class="carousel-inner"> 
+        {% for book_part in carousel.book_group %}
+          <div class="carousel-item {% if forloop.first %}active{% endif %}">
+            <div class="row justify-content-center">
+              {% for book in book_part %}
+                {% if book %}
+                <div class="col-md-3 col-sm-6">
+                  <a href="{% url 'book_detail' book.id %}" style="text-decoration: none; color: inherit;" class="card-link">
+                    <div class="book-card">
+                      {% if book.cover_image %}
+                        <img src="{{ book.cover_image.url|cloudinary_minimize_image }}" loading="lazy" class="card-img-top" alt="{{ book.title }}">
+                      {% else %}
+                        <img src="{% static 'site_images/unavailable_img.jpg' %}" loading="lazy" class="card-img-top" alt="{{ book.title }}">
+                      {% endif %}
+                      <div class="card-body">
+                        <h5 class="card-title"><strong>{{ book.title }}</strong></h5>
+                        <p class="card-text">
+                          <strong>Szerző:</strong> {{ book.author.k_nev }} {{ book.author.v_nev }}<br>
+                          <strong>Műfaj:</strong>
+                          {% for category in book.category.all %}
+                            {{ category.category_name }}{% if not forloop.last %}, {% endif %}
+                          {% endfor %}
+                        </p>
+                        {% if book.is_available %}
+                          <p class="availability-status available">Elérhető: {{ book.available_copies }} db</p>
+                        {% else %}
+                          <p class="availability-status unavailable">Nem elérhető.</p>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </a>
+                </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <!-- CAROUSEL CONTROLS -->
+      <a class="carousel-control-prev" href="#recommendedCategoryCarousel{{ forloop.counter }}" role="button" data-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="sr-only">Previous</span>
+      </a>
+      <a class="carousel-control-next" href="#recommendedCategoryCarousel{{ forloop.counter }}" role="button" data-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="sr-only">Next</span>
+      </a>
+
+    </div>  
+  </div>
+{% endfor %}
+<!-- END VÉLETLENSZERŰ KATEGÓRIA CAROUSEL/LISTA -->
+
+<!--EXCLUDED  CATEGORY-->
+{% for carousel in excluded_category_carousel %}
+<div class="container home-body">
+  <h2 class="carousel-h2 fade-in-effect-general">Fedezd fel: {{ carousel.category.category_name }}</h2>
+  <div id="excludedCategoryCarousel" class="carousel slide carousel-books-list fade-in-effect-general" data-ride="carousel" data-interval="false">
+
+    <!-- POTTYOK -->
+    <ol class="carousel-indicators">
+      {% for book_part in carousel.book_group %}
+        <li data-target="#excludedCategoryCarousel{{ forloop.parentloop.counter }}" 
+            data-slide-to="{{ forloop.counter0 }}" 
+            class="{% if forloop.first %}active{% endif %}"></li>
+      {% endfor %}
+    </ol>
+
+    <!-- tovabbi konyvek -->
+    <div class="tovabbi-konyvek d-flex justify-content-end align-items-center mb-3">
+      <a href="{% url 'category_filter' carousel.category.id %}" class="btn search-button">
+        További könyvek <i class="fa fa-arrow-right"></i>
+      </a>
+    </div>
+
+    <div class="carousel-inner"> 
+      {% for book_part in carousel.book_group %}
+        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+          <div class="row justify-content-center">
+            {% for book in book_part %}
+              {% if book %}
+              <div class="col-md-3 col-sm-6">
+                <a href="{% url 'book_detail' book.id %}" style="text-decoration: none; color: inherit;" class="card-link">
+                  <div class="book-card">
+                    {% if book.cover_image %}
+                      <img src="{{ book.cover_image.url|cloudinary_minimize_image }}" loading="lazy" class="card-img-top" alt="{{ book.title }}">
+                    {% else %}
+                      <img src="{% static 'site_images/unavailable_img.jpg' %}" loading="lazy" class="card-img-top" alt="{{ book.title }}">
+                    {% endif %}
+                    <div class="card-body">
+                      <h5 class="card-title"><strong>{{ book.title }}</strong></h5>
+                      <p class="card-text">
+                        <strong>Szerző:</strong> {{ book.author.k_nev }} {{ book.author.v_nev }}<br>
+                        <strong>Műfaj:</strong>
+                        {% for category in book.category.all %}
+                          {{ category.category_name }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                      </p>
+                      {% if book.is_available %}
+                        <p class="availability-status available">Elérhető: {{ book.available_copies }} db</p>
+                      {% else %}
+                        <p class="availability-status unavailable">Nem elérhető.</p>
+                      {% endif %}
+                    </div>
+                  </div>
+                </a>
+              </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- CAROUSEL CONTROLS -->
+    <a class="carousel-control-prev" href="#excludedCategoryCarousel" role="button" data-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="sr-only">Previous</span>
+    </a>
+    <a class="carousel-control-next" href="#excludedCategoryCarousel" role="button" data-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="sr-only">Next</span>
+    </a>
+
+  </div>  
+  <!--EXCLUDED CATEGORY END -->
+</div>
+
+{% endfor %}
+
+{%block extrascript%}
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const faders = document.querySelectorAll('.fade-in-effect-general');
+  
+    const appearOptions = {
+      threshold: 0.10,
+      rootMargin: "0px 0px -50px 0px"
+    };
+  
+    const appearOnScroll = new IntersectionObserver(function (entries, observer) {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+  
+        entry.target.classList.add("visible");
+        observer.unobserve(entry.target);
+      });
+    }, appearOptions);
+  
+    faders.forEach(fader => {
+      appearOnScroll.observe(fader);
+    });
+  });
+  </script>
+
+{%endblock%}
+
+
+
+{%include 'footer.html'%}
+  
+{% endblock %}
