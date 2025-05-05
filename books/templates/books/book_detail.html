@@ -2,6 +2,7 @@
 
 {%load static%}
 {% load custom_filters %} <!-- ertekeleshez, tobb csillag megjelenitesehez. templatetags folder-->
+{% load cloudinary_optimize %}
 
 {%block filter_navbar%}
   {% include 'filter_navbar.html' %}
@@ -39,7 +40,7 @@
       <div class="col-md-4 col-sm-8">
         <div class="book-cover-container">
           {% if book.cover_image %}
-            <img src="{{ book.cover_image.url }}" class="img-thumbnail book-cover-details" alt="{{ book.title }}">
+            <img src="{{ book.cover_image.url|minimize_cloudinary_image }}" class="img-thumbnail book-cover-details" alt="{{ book.title }}">
           {% else %}
             <img src="{% static 'site_images/unavailable_img.jpg' %}" class="img-fluid" alt="{{ book.title }}">
           {% endif %}
