@@ -14,7 +14,7 @@
     <title>{% block title %}Library-O{% endblock %}</title>
     <link rel="icon" 
     href= "https://w7.pngwing.com/pngs/541/36/png-transparent-literature-review-computer-icons-electronic-literature-prose-others-miscellaneous-angle-rectangle-thumbnail.png" 
-    type="image/png" /> <!-- a kép netről lett szedve. -->
+    type="image/png" />
 
 </head>
 <body>
@@ -43,7 +43,7 @@
   {% block content %}
   {% endblock %}
   
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- jQuery segitsegevel harom masodperc utan eltunik a message pl. beleptetesnel -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- jQuery segitsegevel 4 masodperc utan eltunik a message pl. beleptetesnel, ehhez importaltuk... -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script> <!--container indicators-->
 
   <script>
@@ -56,11 +56,9 @@
 
   <!-- ahol van masodik navbar, ott csuszik le ahogyan scrollol le a user. -->
   <script>
-    // Select the two navbars
     const firstNavbar = document.querySelector('.navbar-light');
     const filterNavbar = document.querySelector('.filter-navbar-custom');
   
-    // Function to manage navbar visibility on scroll
     window.onscroll = function () {
       if (window.scrollY > firstNavbar.offsetHeight) {
         filterNavbar.classList.add('sticky');
