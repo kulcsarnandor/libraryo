@@ -198,22 +198,23 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 MEDIA_URL = 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-#if DEBUG:
-#   CACHES = {
-#        'default': {
-#            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-#        }
-#    }
-#else:
-CACHES = {
-        "default": {
-            "BACKEND": "django_redis.cache.RedisCache",
-            "LOCATION": os.environ.get('REDIS_URL', 'redis://127.0.0.1:6379/1'), 
-            "OPTIONS": {
-                "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            }
+
+if ENVIRONMENT == 'development':
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         }
     }
+else:   
+    CACHES = {
+            "default": {
+                "BACKEND": "django_redis.cache.RedisCache",
+                "LOCATION": os.environ.get('REDIS_URL', 'redis://127.0.0.1:6379/1'), 
+                "OPTIONS": {
+                    "CLIENT_CLASS": "django_redis.client.DefaultClient",
+                }
+            }
+        }
 
 
 # Default primary key field type
