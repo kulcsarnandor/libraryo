@@ -20,6 +20,9 @@
                     <h4 class="text-center mb-0">Jelenlegi kölcsönzéseim</h4>
                     <hr>
                     <div class="row">
+                        
+                    {% with 1 as counter %}
+                        
                     {% if current_borrowings %}
                         
                             {% for borrowing in current_borrowings %}
@@ -68,9 +71,11 @@
                                     </div>
                                 </a>
                                 </div>
-                            {% endfor %}
                         
+                            {% with counter|add:"1" as counter %}
+                            {% endwith %}
                         
+                            {% endfor %}     
                     {%endif%}
 
                     <!--VERIFIED -->
@@ -128,8 +133,11 @@
                             </div>
                             </a>
                         </div>
+                        {% with counter|add:"1" as counter %}
+                        {% endwith %}
                         {% endfor %}
                     {%endif %}
+                {% endwith %}
                     {% if not current_borrowings and not verified_borrowings %}
                     <div class="no-content-alert">
                         <p>Nincsenek jelenleg kölcsönzéseid...</p>
