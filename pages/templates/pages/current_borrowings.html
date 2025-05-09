@@ -21,8 +21,6 @@
                     <hr>
                     <div class="row">
                         
-                    {% with 1 as counter %}
-                        
                     {% if current_borrowings %}
                         
                             {% for borrowing in current_borrowings %}
@@ -72,8 +70,6 @@
                                 </a>
                                 </div>
                         
-                            {% with counter|add:"1" as counter %}
-                            {% endwith %}
                         
                             {% endfor %}     
                     {%endif%}
@@ -102,7 +98,7 @@
                                 <div class="card-body">
                                 <div class="book-count-info">
                                     <div class="book-count">
-                                    <span>{{ verif_borrowing.borrowing.book_copies.count }}</span>
+                                    <span>{{ borrowing.book_copies.count }}</span>
                                     <small>könyv</small>
                                     </div>
                                 </div>
@@ -133,11 +129,8 @@
                             </div>
                             </a>
                         </div>
-                        {% with counter|add:"1" as counter %}
-                        {% endwith %}
                         {% endfor %}
                     {%endif %}
-                {% endwith %}
                     {% if not current_borrowings and not verified_borrowings %}
                     <div class="no-content-alert">
                         <p>Nincsenek jelenleg kölcsönzéseid...</p>
