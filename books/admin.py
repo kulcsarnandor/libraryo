@@ -33,7 +33,6 @@ class BookAdmin(admin.ModelAdmin):
         qs = super().get_queryset(request)
         return qs.select_related('author').prefetch_related('category', 'book_copies')
 
-    # 🎯 Pretty preview of uploaded cover
     def cover_image_preview(self, obj):
         if obj.cover_image:
             return format_html('<img src="{}" style="max-height: 300px; max-width: 200px; border: 1px solid #ccc;" />', obj.cover_image.url)
