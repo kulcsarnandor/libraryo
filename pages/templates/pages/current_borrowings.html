@@ -17,6 +17,12 @@
         <div class="col-md-9">
             <div class="card from-left-animate">
                 <div class="card-body">
+                    <div class="book-count-info">
+                        <div class="book-count">
+                            <span>{{ borrowing.book_copies.count }}</span>
+                            <small>könyv</small>
+                        </div>
+                    </div>
                     <h4 class="text-center mb-0">Jelenlegi kölcsönzéseim</h4>
                     <hr>
                     <div class="row">
@@ -29,9 +35,9 @@
                                     <div class="current-card card h-100 shadow">
                                         <div class="card-header current-card-header foglalva-header">
                                             <div class="d-flex justify-content-between align-items-center">
-                                                <h5 class="card-title mb-0">
+                                                <!-- <h5 class="card-title mb-0">
                                                     <span class="history-number">#{{ forloop.counter }}</span>
-                                                </h5>
+                                                </h5> -->
                                                     <span class="span-foglalva">Foglalva...</span>
                                             </div>
                                         </div>
@@ -79,9 +85,9 @@
                                 <div class="card-header 
                                  {%if verif_borrowing.is_late%}history-card-header late-header{%else%} verified-card-header verified-header{% endif %}">
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <h5 class="card-title mb-0">
+                                    <!-- <h5 class="card-title mb-0">
                                     <span class="history-number">#{{ forloop.counter }}</span>
-                                    </h5>
+                                    </h5> -->
                                     {%if verif_borrowing.is_late%}
                                     <span class="span-verified">VISSZAHOZNI!</span>
                                     {%else%}
@@ -90,6 +96,12 @@
                                 </div>
                                 </div>
                                 <div class="card-body">
+                                    <div class="book-count-info">
+                                        <div class="book-count">
+                                        <span>{{ verif_borrowing.borrowing.book_copies.count }}</span>
+                                        <small>könyv</small>
+                                    </div>
+                                </div>
                                 <div class="books-history-list">
                                     <ul class="book-history-titles">
                                     {% for book_copy in verif_borrowing.borrowing.book_copies.all|slice:":2" %}
