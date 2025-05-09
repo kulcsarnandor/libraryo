@@ -36,12 +36,6 @@
                                             </div>
                                         </div>
                                         <div class="card-body">
-                                            <div class="book-count-info">
-                                                <div class="book-count">
-                                                    <span>{{ borrowing.book_copies.count }}</span>
-                                                    <small>könyv</small>
-                                                </div>
-                                            </div>
                                             
                                             <div class="books-history-list">
                                                 <ul class="book-history-titles">
@@ -96,13 +90,6 @@
                                 </div>
                                 </div>
                                 <div class="card-body">
-                                <div class="book-count-info">
-                                    <div class="book-count">
-                                    <span>{{ borrowing.book_copies.count }}</span>
-                                    <small>könyv</small>
-                                    </div>
-                                </div>
-
                                 <div class="books-history-list">
                                     <ul class="book-history-titles">
                                     {% for book_copy in verif_borrowing.borrowing.book_copies.all|slice:":2" %}
