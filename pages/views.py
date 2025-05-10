@@ -123,7 +123,6 @@ def for_you_filter_view(request):
 
 
 @login_required
-@cache_page(900)
 def profile_page_view(request):
     return render(request, 'profile.html', {})
 
